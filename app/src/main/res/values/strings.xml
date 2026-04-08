@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Fuel Cost</string>
+    <string name="title">Fuel Cost Calculator</string>
+    <string name="start">Start</string>
+    <string name="distance">Distance (km)</string>
+    <string name="consumption">Fuel Consumption</string>
+    <string name="price">Fuel Price</string>
+    <string name="calculate">Calculate</string>
+    <string name="result">Total Cost</string>
+    <string name="error_empty">All input must be filled</string>
+</resources>
