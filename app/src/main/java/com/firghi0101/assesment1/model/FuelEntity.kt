@@ -1,5 +1,7 @@
-import androidx.room3.Entity
-import androidx.room3.PrimaryKey
+package com.firghi0101.assesment1.model
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 @Entity(tableName = "fuel_history")
 data class FuelEntity(
