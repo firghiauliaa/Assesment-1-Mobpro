@@ -3,14 +3,20 @@ package com.firghi0101.assesment1.ui.screen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,9 +31,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,13 +41,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.firghi0101.assesment1.R
+import com.firghi0101.assesment1.model.FuelEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavController, viewModel: MainViewModel ) {
-
+fun MainScreen(
+    navController: NavController,
+    viewModel: MainViewModel
+) {
     val fuelList by viewModel.fuelList.collectAsState()
-    var showList by remember { mutableStateOf(true) }
+    val isLinearLayout by viewModel.isLinearLayout.collectAsState()
 
     Scaffold(
         topBar = {
@@ -52,8 +58,6 @@ fun MainScreen(navController: NavController, viewModel: MainViewModel ) {
                 title = {
                     Text(
                         text = "FuelCost",
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
@@ -62,17 +66,11 @@ fun MainScreen(navController: NavController, viewModel: MainViewModel ) {
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
                 actions = {
-                    IconButton(onClick = { showList = !showList }) {
+                    IconButton(onClick = { viewModel.toggleLayout(!isLinearLayout) }) {
                         Icon(
-                            painter = painterResource(
-                                if (showList) R.drawable.baseline_view_list_24
-                                else R.drawable.baseline_grid_view_24
-                            ),
-                            contentDescription = stringResource(
-                                if (showList) R.string.grid
-                                else R.string.list
-                            ),
-                            tint = MaterialTheme.colorScheme.primary
+                            imageVector = if (isLinearLayout) Icons.Filled.Menu else Icons.Filled.List,
+                            contentDescription = if (isLinearLayout) stringResource(R.string.grid) else stringResource(R.string.list),
+                            tint = Color.White
                         )
                     }
                 }
@@ -80,84 +78,121 @@ fun MainScreen(navController: NavController, viewModel: MainViewModel ) {
         }
     ) { padding ->
 
-        LazyColumn(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(if (isLinearLayout) 1 else 2),
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.bensin),
-                    contentDescription = "Fuel Image",
-                    modifier = Modifier.size(140.dp)
-                )
-            }
-
-            item {
-                Text(
-                    text = "Welcome to Fuel Cost App",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center
-                )
-            }
-
-            item {
-                Button(
-                    onClick = { navController.navigate("calculator") },
-                    modifier = Modifier.fillMaxWidth(0.5f)
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Start", fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-
-            if (fuelList.isNotEmpty()) {
-                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.bensin),
+                        contentDescription = "Fuel Image",
+                        modifier = Modifier.size(140.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Riwayat Perjalanan",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Start,
-                        fontWeight = FontWeight.Bold
+                        text = "Welcome to Fuel Cost App",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center
                     )
-                }
-            }
-
-
-            items(fuelList) { fuel ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = { navController.navigate("calculator") },
+                        modifier = Modifier.fillMaxWidth(0.5f)
                     ) {
+                        Text("Start", fontWeight = FontWeight.Bold)
+                    }
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    if (fuelList.isNotEmpty()) {
                         Text(
-                            text = "Jarak: ${fuel.jarak} km",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            text = "Total Biaya: Rp ${fuel.totalBiaya}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.primary,
+                            text = "Riwayat Perjalanan",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Start,
                             fontWeight = FontWeight.Bold
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
+
+            items(fuelList) { fuel ->
+                if (isLinearLayout) {
+                    ListItem(fuel = fuel)
+                } else {
+                    GridItem(fuel = fuel)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ListItem(fuel: FuelEntity) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Jarak: ${fuel.jarak} km",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = "Rp ${fuel.totalBiaya}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+fun GridItem(fuel: FuelEntity) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = "Jarak: ${fuel.jarak} km",
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = "Rp ${fuel.totalBiaya}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.secondary,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
