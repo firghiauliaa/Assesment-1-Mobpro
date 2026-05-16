@@ -4,9 +4,9 @@ sealed class Screen(val route: String) {
 
     data object Main : Screen("main")
 
-    data object Form : Screen("form")
+    data object Form : Screen("calculator")
 
-    data object Edit : Screen("form_screen/{id}") {
-        fun withId(id: Long) = "form_screen/$id"
+    data object Edit : Screen("calculator_screen/{id}") {
+        fun withId(id: Long) = "calculator_screen/$id"
     }
 }

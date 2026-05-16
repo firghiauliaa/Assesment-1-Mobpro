@@ -27,7 +27,7 @@ import com.firghi0101.assesment1.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavController) {
+fun MainScreen(navController: NavController, viewModel: MainViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(

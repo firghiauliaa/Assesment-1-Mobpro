@@ -36,11 +36,11 @@ import androidx.navigation.NavController
 import com.firghi0101.assesment1.R
 import java.text.NumberFormat
 import java.util.Locale
-
+import com.firghi0101.assesment1.model.FuelEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalculatorScreen(navController: NavController) {
+fun CalculatorScreen(navController: NavController, viewModel: MainViewModel) {
 
     var jarak by remember { mutableStateOf("") }
     var konsumsi by remember { mutableStateOf("") }
@@ -144,15 +144,26 @@ fun CalculatorScreen(navController: NavController) {
                     errorMessage = "konsumsi tidak boleh 0"
                     hasil = ""
                 } else {
+
                     isError = false
                     errorMessage = ""
 
                     val bensin = j / k
                     val total = bensin * h
 
+                    val entity = FuelEntity(
+                        jarak = j.toFloat(),
+                        konsumsi = k.toFloat(),
+                        harga = h.toFloat(),
+                        totalBiaya = total
+                    )
+
+                    viewModel.insertFuel(entity)
+
                     val formatRupiah = NumberFormat.getCurrencyInstance(
                         Locale.forLanguageTag("id-ID")
                     )
+
                     hasil = "Total biaya: ${formatRupiah.format(total)}"
                 }
 
