@@ -8,4 +8,6 @@
     <string name="calculate">Calculate</string>
     <string name="result">Total Cost</string>
     <string name="error_empty">All input must be filled</string>
+    <string name="list" translatable="false">Tampilan List</string>
+    <string name="grid" translatable="false">Tampilan Grid</string>
 </resources>
