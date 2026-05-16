@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
 }
@@ -7,12 +8,12 @@ plugins {
 android {
 
     namespace = "com.firghi0101.assesment1"
-    compileSdk = 37
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.firghi0101.assesment1"
         minSdk = 26
-        targetSdk = 37
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -34,9 +35,10 @@ android {
         compose = true
     }
 }
-
-kotlin {
-    jvmToolchain(17)
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 }
 
 dependencies {
