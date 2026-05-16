@@ -24,7 +24,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             initialValue = emptyList()
         )
 
-    val isLinearLayout: StateFlow<Boolean> = layoutStore.layoutFlow
+    val isGridLayout: StateFlow<Boolean> = layoutStore.layoutFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -43,9 +43,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun toggleLayout(isLinear: Boolean) {
+    fun toggleLayout(isGrid: Boolean) {
         viewModelScope.launch {
-            layoutStore.saveLayout(isLinear)
+            layoutStore.saveLayout(isGrid)
         }
     }
 }

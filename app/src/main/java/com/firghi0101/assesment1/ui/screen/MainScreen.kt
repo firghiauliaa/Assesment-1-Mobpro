@@ -15,7 +15,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -30,7 +30,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,8 +48,11 @@ fun MainScreen(
     navController: NavController,
     viewModel: MainViewModel
 ) {
-    val fuelList by viewModel.fuelList.collectAsState()
-    val isLinearLayout by viewModel.isLinearLayout.collectAsState()
+    val fuelListState = viewModel.fuelList.collectAsState()
+    val fuelList = fuelListState.value
+
+    val isGridLayoutState = viewModel.isGridLayout.collectAsState()
+    val isGridLayout = isGridLayoutState.value
 
     Scaffold(
         topBar = {
@@ -66,10 +68,10 @@ fun MainScreen(
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
                 actions = {
-                    IconButton(onClick = { viewModel.toggleLayout(!isLinearLayout) }) {
+                    IconButton(onClick = { viewModel.toggleLayout(!isGridLayout) }) {
                         Icon(
-                            imageVector = if (isLinearLayout) Icons.Filled.Menu else Icons.Filled.List,
-                            contentDescription = if (isLinearLayout) stringResource(R.string.grid) else stringResource(R.string.list),
+                            imageVector = if (isGridLayout) Icons.AutoMirrored.Filled.List else Icons.Filled.Menu,
+                            contentDescription = if (isGridLayout) stringResource(R.string.list) else stringResource(R.string.grid),
                             tint = Color.White
                         )
                     }
@@ -79,7 +81,7 @@ fun MainScreen(
     ) { padding ->
 
         LazyVerticalGrid(
-            columns = GridCells.Fixed(if (isLinearLayout) 1 else 2),
+            columns = GridCells.Fixed(if (isGridLayout) 2 else 1),
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
@@ -128,10 +130,10 @@ fun MainScreen(
             }
 
             items(fuelList) { fuel ->
-                if (isLinearLayout) {
-                    ListItem(fuel = fuel)
-                } else {
+                if (isGridLayout) {
                     GridItem(fuel = fuel)
+                } else {
+                    ListItem(fuel = fuel)
                 }
             }
         }
