@@ -61,7 +61,7 @@ fun MainScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(onClick = {
-                   navController.navigate("Calculator")
+                   navController.navigate("calculator")
                 }) {
                     Text("Start")
                 }
