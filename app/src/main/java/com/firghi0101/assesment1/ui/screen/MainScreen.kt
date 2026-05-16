@@ -1,6 +1,8 @@
 package com.firghi0101.assesment1.ui.screen
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +19,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,10 +29,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,7 +48,7 @@ import androidx.navigation.NavController
 import com.firghi0101.assesment1.R
 import com.firghi0101.assesment1.model.FuelEntity
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MainScreen(
     navController: NavController,
@@ -53,6 +59,9 @@ fun MainScreen(
 
     val isGridLayoutState = viewModel.isGridLayout.collectAsState()
     val isGridLayout = isGridLayoutState.value
+
+    val fuelToDeleteState = remember { mutableStateOf<FuelEntity?>(null) }
+    val fuelToDelete = fuelToDeleteState.value
 
     Scaffold(
         topBar = {
@@ -79,6 +88,16 @@ fun MainScreen(
             )
         }
     ) { padding ->
+
+        fuelToDelete?.let { fuel ->
+            DeleteConfirmationDialog(
+                onDismissRequest = { fuelToDeleteState.value = null },
+                onConfirm = {
+                    viewModel.deleteFuel(fuel)
+                    fuelToDeleteState.value = null
+                }
+            )
+        }
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(if (isGridLayout) 2 else 1),
@@ -118,7 +137,7 @@ fun MainScreen(
 
                     if (fuelList.isNotEmpty()) {
                         Text(
-                            text = "Riwayat Perjalanan",
+                            text = "Riwayat Perjalanan (Tahan untuk menghapus)",
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Start,
@@ -131,19 +150,25 @@ fun MainScreen(
 
             items(fuelList) { fuel ->
                 if (isGridLayout) {
-                    GridItem(fuel = fuel)
+                    GridItem(fuel = fuel, onLongClick = { fuelToDeleteState.value = fuel })
                 } else {
-                    ListItem(fuel = fuel)
+                    ListItem(fuel = fuel, onLongClick = { fuelToDeleteState.value = fuel })
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ListItem(fuel: FuelEntity) {
+fun ListItem(fuel: FuelEntity, onLongClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = { /* Klik biasa dikosongkan */ },
+                onLongClick = { onLongClick() }
+            ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
@@ -170,10 +195,16 @@ fun ListItem(fuel: FuelEntity) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun GridItem(fuel: FuelEntity) {
+fun GridItem(fuel: FuelEntity, onLongClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = { /* Klik biasa dikosongkan */ },
+                onLongClick = { onLongClick() }
+            ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
@@ -197,4 +228,37 @@ fun GridItem(fuel: FuelEntity) {
             )
         }
     }
+}
+
+@Composable
+fun DeleteConfirmationDialog(
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { onDismissRequest() },
+        title = {
+            Text(
+                text = "Hapus Riwayat",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Text(
+                text = "Apakah Anda yakin ingin menghapus data riwayat perjalanan ini?",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm() }) {
+                Text(text = "Hapus", color = MaterialTheme.colorScheme.error)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onDismissRequest() }) {
+                Text(text = "Batal")
+            }
+        }
+    )
 }
