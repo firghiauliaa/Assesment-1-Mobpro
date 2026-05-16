@@ -47,6 +47,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.firghi0101.assesment1.R
 import com.firghi0101.assesment1.model.FuelEntity
+import java.text.NumberFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -186,7 +188,7 @@ fun ListItem(fuel: FuelEntity, onLongClick: () -> Unit) {
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = "Rp ${fuel.totalBiaya}",
+                text = formatRupiah(fuel.totalBiaya),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
@@ -221,7 +223,7 @@ fun GridItem(fuel: FuelEntity, onLongClick: () -> Unit) {
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = "Rp ${fuel.totalBiaya}",
+                text = formatRupiah(fuel.totalBiaya),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.Bold
@@ -261,4 +263,10 @@ fun DeleteConfirmationDialog(
             }
         }
     )
+}
+fun formatRupiah(koin: Double): String {
+    val localeID = Locale("in", "ID")
+    val numberFormat = NumberFormat.getCurrencyInstance(localeID)
+    numberFormat.maximumFractionDigits = 0
+    return numberFormat.format(koin)
 }
