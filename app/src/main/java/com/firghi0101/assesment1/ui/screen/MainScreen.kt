@@ -49,6 +49,9 @@ import com.firghi0101.assesment1.R
 import com.firghi0101.assesment1.model.FuelEntity
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.getValue
+import com.firghi0101.assesment1.network.ApiStatus
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -58,6 +61,8 @@ fun MainScreen(
 ) {
     val fuelListState = viewModel.fuelList.collectAsState()
     val fuelList = fuelListState.value
+
+    val status by viewModel.status.collectAsState()
 
     val isGridLayoutState = viewModel.isGridLayout.collectAsState()
     val isGridLayout = isGridLayoutState.value
@@ -90,6 +95,61 @@ fun MainScreen(
             )
         }
     ) { padding ->
+
+        when (status) {
+
+            ApiStatus.LOADING -> {
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+
+                    CircularProgressIndicator()
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text("Mengambil data dari server...")
+                }
+
+                return@Scaffold
+            }
+
+            ApiStatus.FAILED -> {
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+
+                    Text(
+                        text = "Gagal terhubung ke server",
+                        color = MaterialTheme.colorScheme.error
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(
+                        onClick = {
+                            viewModel.retrieveData()
+                        }
+                    ) {
+                        Text("Coba Lagi")
+                    }
+                }
+
+                return@Scaffold
+            }
+
+            ApiStatus.SUCCESS -> {
+            }
+        }
 
         fuelToDelete?.let { fuel ->
             DeleteConfirmationDialog(
