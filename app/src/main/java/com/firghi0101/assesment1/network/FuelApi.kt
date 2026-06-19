@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object FuelApi {
 
     private const val BASE_URL =
-        "GANTI_DENGAN_URL_MOCKAPI_KAMU/"
+        "https://6a350930f957779fdb300042.mockapi.io/api/:endpoint/"
 
     val service: FuelApiService by lazy {
 
