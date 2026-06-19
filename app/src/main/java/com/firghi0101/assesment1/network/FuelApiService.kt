@@ -4,21 +4,21 @@ import retrofit2.http.*
 
 interface FuelApiService {
 
-    @GET("fuelhistory")
+    @GET("FuelCost")
     suspend fun getFuelHistory(): List<FuelApiModel>
 
-    @POST("fuelhistory")
+    @POST("FuelCost")
     suspend fun addFuel(
         @Body fuel: FuelApiModel
     ): FuelApiModel
 
-    @PUT("fuelhistory/{id}")
+    @PUT("FuelCost/{id}")
     suspend fun updateFuel(
         @Path("id") id: String,
         @Body fuel: FuelApiModel
     ): FuelApiModel
 
-    @DELETE("fuelhistory/{id}")
+    @DELETE("FuelCost/{id}")
     suspend fun deleteFuel(
         @Path("id") id: String
     )

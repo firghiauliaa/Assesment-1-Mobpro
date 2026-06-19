@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.firghi0101.assesment1.network.FuelApiModel
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -51,13 +52,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
                 val result = FuelApi.service.getFuelHistory()
 
-                println("Jumlah data dari API: ${result.size}")
+                android.util.Log.d(
+                    "API_SUCCESS",
+                    result.toString()
+                )
 
                 _status.value = ApiStatus.SUCCESS
 
             } catch (e: Exception) {
 
-                e.printStackTrace()
+                android.util.Log.e(
+                    "API_ERROR",
+                    e.stackTraceToString()
+                )
 
                 _status.value = ApiStatus.FAILED
             }
@@ -70,15 +77,76 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun deleteFuel(fuel: FuelEntity) {
+    fun deleteFuelApi(id: String) {
         viewModelScope.launch {
-            fuelDao.delete(fuel)
+            try {
+                FuelApi.service.deleteFuel(id)
+                retrieveData()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
     fun toggleLayout(isGrid: Boolean) {
         viewModelScope.launch {
             layoutStore.saveLayout(isGrid)
+        }
+    }
+
+    fun updateFuelApi(fuel: FuelApiModel) {
+        viewModelScope.launch {
+            try {
+                FuelApi.service.updateFuel(
+                    fuel.id,
+                    fuel
+                )
+                retrieveData()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun addFuelToApi(
+        jarak: Double,
+        konsumsi: Double,
+        harga: Double,
+        total: Double
+    ) {
+
+        viewModelScope.launch {
+
+            try {
+
+                val fuel = FuelApiModel(
+                    userId = "firghi",
+                    vehicleName = "Motor",
+                    distance = jarak,
+                    fuelConsumption = konsumsi,
+                    fuelPrice = harga,
+                    totalCost = total,
+                    createdAt = System.currentTimeMillis().toString()
+                )
+
+                val response = FuelApi.service.addFuel(fuel)
+
+                android.util.Log.d(
+                    "POST_SUCCESS",
+                    response.toString()
+                )
+
+                retrieveData()
+
+            } catch (e: Exception) {
+
+                android.util.Log.e(
+                    "POST_ERROR",
+                    e.stackTraceToString()
+                )
+
+                _status.value = ApiStatus.FAILED
+            }
         }
     }
 }
